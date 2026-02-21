@@ -1,0 +1,203 @@
+<!-- pages/review/input.wxml -->
+<view class="page-container">
+  <view class="form-section">
+    <view class="section-title">现在的真相</view>
+
+    <!-- 实际结果 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">实际结果如何?</text>
+        <text class="label-required">*</text>
+      </view>
+      <textarea
+        class="form-textarea"
+        placeholder="描述真实的结果"
+        value="{{actualOutcome}}"
+        bindinput="onActualOutcomeInput"
+        maxlength="1000"
+        auto-height
+      />
+    </view>
+
+    <!-- 结果评价 -->
+    <view class="form-group" wx:if="{{actualOutcome.length > 0}}">
+      <view class="form-label">
+        <text class="label-text">你觉得这次结果如何?</text>
+        <text class="label-required">*</text>
+      </view>
+      <view class="outcome-type-list">
+        <view
+          class="outcome-type-btn {{outcomeType === 'positive' ? 'outcome-positive-active' : ''}}"
+          bindtap="selectOutcomeType"
+          data-key="positive"
+        >
+          <text class="outcome-icon">✅</text>
+          <view class="outcome-info">
+            <text class="outcome-label">做对了</text>
+            <text class="outcome-desc">结果符合或超出预期</text>
+          </view>
+        </view>
+        <view
+          class="outcome-type-btn {{outcomeType === 'negative' ? 'outcome-negative-active' : ''}}"
+          bindtap="selectOutcomeType"
+          data-key="negative"
+        >
+          <text class="outcome-icon">❌</text>
+          <view class="outcome-info">
+            <text class="outcome-label">做错了</text>
+            <text class="outcome-desc">结果不如预期</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- === 负面复盘字段 === -->
+    <block wx:if="{{outcomeType === 'negative'}}">
+      <!-- 错误假设 -->
+      <view class="form-group">
+        <view class="form-label">
+          <text class="label-text">哪些假设是错的?</text>
+          <text class="label-required">*</text>
+        </view>
+        <textarea
+          class="form-textarea"
+          placeholder="回忆一下，当时的哪些判断被现实推翻了"
+          value="{{wrongAssumptions}}"
+          bindinput="onWrongAssumptionsInput"
+          maxlength="1000"
+          auto-height
+        />
+      </view>
+
+      <!-- 错误类型 -->
+      <view class="form-group">
+        <view class="form-label">
+          <text class="label-text">这是什么类型的错误?</text>
+          <text class="label-required">*</text>
+        </view>
+        <view class="error-type-list">
+          <view
+            class="error-type-btn {{errorType === item.key ? 'type-active' : ''}}"
+            wx:for="{{errorTypes}}"
+            wx:key="key"
+            bindtap="selectErrorType"
+            data-key="{{item.key}}"
+          >
+            <text class="type-label">{{item.label}}</text>
+            <text class="type-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 影响因素（负面） -->
+      <view class="form-group">
+        <view class="form-label">
+          <text class="label-text">什么因素影响了你?</text>
+          <text class="label-required">* 至少选1个</text>
+        </view>
+        <view class="influence-list">
+          <view
+            class="influence-btn {{influences[item.key] ? 'influence-active' : ''}}"
+            wx:for="{{negativeInfluenceOptions}}"
+            wx:key="key"
+            bindtap="toggleInfluence"
+            data-key="{{item.key}}"
+          >
+            <view class="influence-check">{{influences[item.key] ? '☑️' : '☐'}}</view>
+            <view class="influence-info">
+              <text class="influence-label">{{item.label}}</text>
+              <text class="influence-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
+            </view>
+          </view>
+        </view>
+        <input
+          class="influence-detail-input"
+          placeholder="具体是?（可选）"
+          value="{{influenceDetails}}"
+          bindinput="onInfluenceDetailsInput"
+        />
+      </view>
+    </block>
+
+    <!-- === 正面复盘字段 === -->
+    <block wx:if="{{outcomeType === 'positive'}}">
+      <!-- 做对了什么 -->
+      <view class="form-group">
+        <view class="form-label">
+          <text class="label-text">你做对了什么?</text>
+          <text class="label-required">*</text>
+        </view>
+        <textarea
+          class="form-textarea"
+          placeholder="哪些判断或行动帮你拿到了好结果"
+          value="{{rightAssumptions}}"
+          bindinput="onRightAssumptionsInput"
+          maxlength="1000"
+          auto-height
+        />
+      </view>
+
+      <!-- 成功类型 -->
+      <view class="form-group">
+        <view class="form-label">
+          <text class="label-text">做对了哪方面?</text>
+          <text class="label-required">*</text>
+        </view>
+        <view class="error-type-list">
+          <view
+            class="error-type-btn {{successType === item.key ? 'type-active' : ''}}"
+            wx:for="{{successTypes}}"
+            wx:key="key"
+            bindtap="selectSuccessType"
+            data-key="{{item.key}}"
+          >
+            <text class="type-label">{{item.label}}</text>
+            <text class="type-desc">{{item.desc}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 成功因素（正面） -->
+      <view class="form-group">
+        <view class="form-label">
+          <text class="label-text">什么因素帮助了你?</text>
+          <text class="label-required">* 至少选1个</text>
+        </view>
+        <view class="influence-list">
+          <view
+            class="influence-btn {{influences[item.key] ? 'influence-active' : ''}}"
+            wx:for="{{positiveInfluenceOptions}}"
+            wx:key="key"
+            bindtap="toggleInfluence"
+            data-key="{{item.key}}"
+          >
+            <view class="influence-check">{{influences[item.key] ? '☑️' : '☐'}}</view>
+            <view class="influence-info">
+              <text class="influence-label">{{item.label}}</text>
+              <text class="influence-desc" wx:if="{{item.desc}}">{{item.desc}}</text>
+            </view>
+          </view>
+        </view>
+        <input
+          class="influence-detail-input"
+          placeholder="具体是?（可选）"
+          value="{{influenceDetails}}"
+          bindinput="onInfluenceDetailsInput"
+        />
+      </view>
+    </block>
+  </view>
+
+  <!-- 底部 -->
+  <view class="bottom-bar">
+    <view class="btn-row">
+      <button class="btn-back" bindtap="goBack">返回</button>
+      <button
+        class="btn-submit {{canSubmit && !submitting ? '' : 'btn-disabled'}}"
+        bindtap="submitReview"
+      >
+        {{submitting ? '分析中...' : '看智能分析'}}
+      </button>
+    </view>
+  </view>
+</view>

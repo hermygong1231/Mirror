@@ -1,0 +1,95 @@
+<!-- pages/create/step2.wxml -->
+<view class="page-container">
+  <!-- 进度条 -->
+  <view class="progress-bar">
+    <view class="progress-steps">
+      <view class="step done">
+        <view class="step-dot">✓</view>
+        <text class="step-label">决策</text>
+      </view>
+      <view class="step-line step-line-active"></view>
+      <view class="step active">
+        <view class="step-dot">2</view>
+        <text class="step-label">理由</text>
+      </view>
+      <view class="step-line"></view>
+      <view class="step">
+        <view class="step-dot">3</view>
+        <text class="step-label">预期</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="form-section">
+    <!-- 标题 -->
+    <view class="section-title" wx:if="{{chosenOption}}">
+      为什么选择「{{chosenOption}}」?
+    </view>
+
+    <!-- 理由 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">你的理由</text>
+        <text class="label-required">*</text>
+      </view>
+      <textarea
+        class="form-textarea"
+        placeholder="为什么倾向于这个选择?"
+        value="{{reasoning}}"
+        bindinput="onReasoningInput"
+        maxlength="1000"
+        auto-height
+      />
+    </view>
+
+    <!-- 担心 -->
+    <view class="form-group concern-group">
+      <view class="form-label">
+        <text class="label-text">直面你的恐惧 💭</text>
+        <text class="label-required">*</text>
+      </view>
+      <textarea
+        class="form-textarea concern-textarea"
+        placeholder="你最担心的风险是什么?\n不要自欺"
+        value="{{concerns}}"
+        bindinput="onConcernsInput"
+        maxlength="1000"
+        auto-height
+      />
+    </view>
+
+    <!-- 情绪选择 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">你现在的情绪?</text>
+        <text class="label-required">*</text>
+      </view>
+      <view class="emotion-grid">
+        <view
+          class="emotion-btn {{emotion === item.key ? 'emotion-active' : ''}}"
+          wx:for="{{emotions}}"
+          wx:key="key"
+          bindtap="selectEmotion"
+          data-key="{{item.key}}"
+        >
+          <text class="emotion-emoji">{{item.emoji}}</text>
+          <text class="emotion-label">{{item.label}}</text>
+        </view>
+      </view>
+      <input
+        class="emotion-note-input"
+        placeholder="补充说明（可选）"
+        value="{{emotionNote}}"
+        bindinput="onEmotionNoteInput"
+      />
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-bar">
+    <view class="btn-row">
+      <button class="btn-back" bindtap="goBack">上一步</button>
+      <button class="btn-next {{canSubmit ? '' : 'btn-disabled'}}" bindtap="goNext">下一步</button>
+    </view>
+  </view>
+</view>

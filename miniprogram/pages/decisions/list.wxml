@@ -1,0 +1,178 @@
+<!-- pages/decisions/list.wxml -->
+<view class="page-container">
+  <!-- 头部 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="app-title">棱镜</text>
+      <text class="app-subtitle">让决策折射真实的你</text>
+    </view>
+    <view class="header-right">
+      <view class="header-action" bindtap="toggleSearch">
+        <text class="action-btn">🔍</text>
+      </view>
+      <view class="header-action" bindtap="exportData" bindlongpress="showStats">
+        <text class="action-btn">📤</text>
+      </view>
+      <view class="header-action" bindtap="goChatBot">
+        <text class="ai-btn">🤖 智能对话</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar" wx:if="{{showSearch}}">
+    <view class="search-input-wrap">
+      <text class="search-icon">🔍</text>
+      <input
+        class="search-input"
+        placeholder="搜索决策..."
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+        focus="{{showSearch}}"
+      />
+      <text class="search-clear" wx:if="{{searchKeyword}}" bindtap="clearSearch">✕</text>
+    </view>
+  </view>
+
+  <!-- Tab栏 -->
+  <view class="tab-bar">
+    <view
+      class="tab-item {{activeTab === 'all' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="all"
+    >全部</view>
+    <view
+      class="tab-item {{activeTab === 'pending' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="pending"
+    >待复盘</view>
+    <view
+      class="tab-item {{activeTab === 'reviewed' ? 'tab-active' : ''}}"
+      bindtap="switchTab"
+      data-tab="reviewed"
+    >已复盘</view>
+  </view>
+
+  <!-- 决策列表 -->
+  <view class="list-container">
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && decisions.length === 0 && !searchKeyword}}">
+      <text class="empty-icon">📋</text>
+      <text class="empty-title">还没有决策记录</text>
+      <text class="empty-desc">记录你的决策，让未来的你复盘</text>
+      <button class="empty-btn" bindtap="goCreate">记录第一个决策</button>
+    </view>
+
+    <!-- 搜索无结果 -->
+    <view class="empty-state" wx:if="{{!loading && decisions.length === 0 && searchKeyword}}">
+      <text class="empty-icon">🔍</text>
+      <text class="empty-title">没有找到相关决策</text>
+      <text class="empty-desc">换个关键词试试</text>
+    </view>
+
+    <!-- 列表 -->
+    <view
+      class="swipe-wrapper"
+      wx:for="{{decisions}}"
+      wx:key="_id"
+    >
+      <!-- 滑动区域 -->
+      <view
+        class="swipe-container"
+        data-id="{{item._id}}"
+        bindtouchstart="onTouchStart"
+        bindtouchmove="onTouchMove"
+        bindtouchend="onTouchEnd"
+      >
+        <view
+          class="swipe-content {{item.animating ? 'swipe-animating' : ''}}"
+          style="transform: translateX({{item.swipeX || 0}}px)"
+          bindtap="goDetail"
+          data-id="{{item._id}}"
+        >
+          <view class="decision-card {{item.isSample ? 'decision-card--sample' : ''}}">
+            <!-- 示例决策引导标签 -->
+            <view class="sample-badge" wx:if="{{item.isSample && !item.isReviewed}}">
+              <text class="sample-badge-icon">✨</text>
+              <text class="sample-badge-text">示例决策 · 点击体验复盘</text>
+            </view>
+            <view class="card-top">
+              <view class="card-status {{item.statusClass}}">{{item.statusText}}</view>
+              <text class="card-date">{{item.createdDate}}</text>
+            </view>
+            <view class="card-title">{{item.decision}}</view>
+            <view class="card-meta">
+              <text class="card-choice">选择: {{item.chosenOption}}</text>
+            </view>
+            <view class="card-bottom">
+              <view class="card-tags">
+                <text class="card-tag" wx:if="{{item.categoryLabel}}">{{item.categoryLabel}}</text>
+                <text class="card-emotion" wx:if="{{item.emotionEmoji}}">{{item.emotionEmoji}} {{item.emotionLabel}}</text>
+              </view>
+              <view class="card-review-date" wx:if="{{item.reviewDateStr && !item.isReviewed}}">
+                复盘: {{item.reviewDateStr}}
+              </view>
+            </view>
+            <view class="card-action-hint" wx:if="{{item.isOverdue && !item.isReviewed}}">
+              <text class="action-arrow">点击开始复盘 →</text>
+            </view>
+            <!-- 等待中：首次用强调引导，之后用低调提示 -->
+            <view class="early-review-guide" wx:if="{{!item.isOverdue && !item.isReviewed && showEarlyReviewHint}}">
+              <view class="early-review-guide-inner">
+                <text class="early-review-guide-icon">💡</text>
+                <view class="early-review-guide-content">
+                  <text class="early-review-guide-title">不用等！有结果就能复盘</text>
+                  <text class="early-review-guide-desc">点击卡片随时开始复盘，体验智能分析</text>
+                </view>
+              </view>
+              <text class="early-review-guide-dismiss" catchtap="dismissEarlyReviewHint">知道了</text>
+            </view>
+            <view class="card-action-hint card-action-hint--early" wx:if="{{!item.isOverdue && !item.isReviewed && !showEarlyReviewHint}}">
+              <text class="action-arrow-early">已有结果？点击提前复盘 →</text>
+            </view>
+            <!-- 已复盘的示例决策：左滑引导 -->
+            <view class="swipe-hint" wx:if="{{item.isSample && item.isReviewed && showSwipeHint}}">
+              <text class="swipe-hint-text">← 左滑可以「重写复盘」或「删除」</text>
+              <text class="swipe-hint-dismiss" catchtap="dismissSwipeHint">知道了</text>
+            </view>
+          </view>
+        </view>
+
+        <!-- 滑出的操作按钮 -->
+        <view class="swipe-actions">
+          <view
+            class="swipe-btn swipe-btn--rewrite"
+            wx:if="{{item.isReviewed}}"
+            catchtap="rewriteReview"
+            data-id="{{item._id}}"
+          >
+            <view class="swipe-btn-circle swipe-btn-circle--rewrite">
+              <image class="swipe-btn-svg" src="/imgs/icon-rewrite.svg" mode="aspectFit" />
+            </view>
+            <text class="swipe-btn-label swipe-btn-label--rewrite">重写</text>
+          </view>
+          <view
+            class="swipe-btn swipe-btn--delete"
+            catchtap="deleteDecision"
+            data-id="{{item._id}}"
+          >
+            <view class="swipe-btn-circle swipe-btn-circle--delete">
+              <image class="swipe-btn-svg" src="/imgs/icon-delete.svg" mode="aspectFit" />
+            </view>
+            <text class="swipe-btn-label swipe-btn-label--delete">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-more" wx:if="{{loading}}">
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <!-- 悬浮按钮 -->
+  <view class="fab" bindtap="goCreate">
+    <text class="fab-icon">+</text>
+  </view>
+</view>

@@ -1,0 +1,176 @@
+<!-- pages/create/step1.wxml -->
+<view class="page-container">
+  <!-- 进度条 -->
+  <view class="progress-bar">
+    <view class="progress-steps">
+      <view class="step active">
+        <view class="step-dot">1</view>
+        <text class="step-label">决策</text>
+      </view>
+      <view class="step-line"></view>
+      <view class="step">
+        <view class="step-dot">2</view>
+        <text class="step-label">理由</text>
+      </view>
+      <view class="step-line"></view>
+      <view class="step">
+        <view class="step-dot">3</view>
+        <text class="step-label">预期</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单内容 -->
+  <view class="form-section">
+    <!-- 决策日期 -->
+    <view class="date-row">
+      <text class="date-label">📅 决策日期</text>
+      <picker mode="date" value="{{decisionDate}}" end="{{maxDate}}" bindchange="onDateChange">
+        <view class="date-picker-btn">
+          <text class="date-value">{{decisionDateDisplay}}</text>
+          <text class="date-arrow">▼</text>
+        </view>
+      </picker>
+    </view>
+
+    <!-- 决策内容 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">你要做什么决定?</text>
+        <text class="label-required">*</text>
+      </view>
+      <textarea
+        class="form-textarea"
+        placeholder="例如: 要不要做这个新功能"
+        value="{{decision}}"
+        bindinput="onDecisionInput"
+        maxlength="500"
+        auto-height
+      />
+    </view>
+
+    <!-- 选项列表 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">有哪些选项?</text>
+        <text class="label-required">*</text>
+      </view>
+      <view class="options-list">
+        <view
+          class="option-row {{chosenOptionId === item.id ? 'option-chosen' : ''}}"
+          wx:for="{{options}}"
+          wx:key="id"
+        >
+          <view class="option-radio" bindtap="chooseOption" data-id="{{item.id}}">
+            <view class="radio-dot {{chosenOptionId === item.id ? 'radio-active' : ''}}"></view>
+          </view>
+          <input
+            class="option-input"
+            placeholder="选项{{index + 1}}"
+            value="{{item.text}}"
+            bindinput="onOptionInput"
+            data-id="{{item.id}}"
+          />
+          <view
+            class="option-delete"
+            wx:if="{{options.length > 1}}"
+            bindtap="removeOption"
+            data-id="{{item.id}}"
+          >
+            <text class="delete-icon">×</text>
+          </view>
+        </view>
+      </view>
+      <view class="add-option" bindtap="addOption" wx:if="{{options.length < 5}}">
+        <text class="add-icon">+</text>
+        <text>添加选项</text>
+      </view>
+    </view>
+
+    <!-- 倾向提示 -->
+    <view class="form-hint" wx:if="{{chosenOptionId}}">
+      <text class="hint-icon">💡</text>
+      <text>已选择倾向，点击选项前的圆点可切换</text>
+    </view>
+    <view class="form-hint" wx:else>
+      <text class="hint-icon">💡</text>
+      <text>犹豫也没关系，点击选项前的圆点记录你的倾向</text>
+    </view>
+
+    <!-- AI智能标签 -->
+    <view class="tags-section {{tagsVisible ? 'tags-visible' : ''}}">
+      <!-- 未展开状态：引导行 -->
+      <view class="tags-header" wx:if="{{!tagsVisible}}">
+        <view class="tags-header-left">
+          <text class="tags-title">智能标签</text>
+          <text class="tags-hint" wx:if="{{tagLoading}}">
+            <text class="loading-dot">·</text> 分析中...
+          </text>
+          <text class="tags-hint" wx:else>填写决策后自动识别</text>
+        </view>
+        <view class="tags-expand-btn" bindtap="expandTags">
+          <text>手动设置</text>
+          <text class="tag-arrow">▼</text>
+        </view>
+      </view>
+      <!-- 已展开状态：标签展示 -->
+      <view class="tags-content" wx:if="{{tagsVisible}}">
+        <view class="tags-header">
+          <view class="tags-header-left">
+            <text class="tags-title">智能标签</text>
+            <text class="tags-badge" wx:if="{{tags.aiGenerated}}">智能</text>
+          </view>
+          <text class="tags-hint-link" bindtap="collapseTags">收起</text>
+        </view>
+        <view class="tags-row">
+          <view class="tag-chip-wrapper">
+            <picker
+              bindchange="onCategoryChange"
+              value="{{categoryIndex}}"
+              range="{{categoryLabels}}"
+            >
+              <view class="tag-chip {{tags.category ? (tags.aiGenerated ? 'tag-chip--ai' : 'tag-chip--manual') : 'tag-chip--empty'}}">
+                <text class="tag-chip-label">类型</text>
+                <text class="tag-chip-value" wx:if="{{categoryDisplay}}">{{categoryDisplay}}</text>
+                <text class="tag-chip-value tag-chip-placeholder" wx:else>选择</text>
+              </view>
+            </picker>
+          </view>
+          <view class="tag-chip-wrapper">
+            <picker
+              bindchange="onRiskChange"
+              value="{{riskIndex}}"
+              range="{{riskLabels}}"
+            >
+              <view class="tag-chip {{tags.riskLevel ? (tags.aiGenerated ? 'tag-chip--ai' : 'tag-chip--manual') : 'tag-chip--empty'}}">
+                <text class="tag-chip-label">风险</text>
+                <text class="tag-chip-value" wx:if="{{riskDisplay}}">{{riskDisplay}}</text>
+                <text class="tag-chip-value tag-chip-placeholder" wx:else>选择</text>
+              </view>
+            </picker>
+          </view>
+          <view class="tag-chip-wrapper">
+            <picker
+              bindchange="onReversibilityChange"
+              value="{{reversibilityIndex}}"
+              range="{{reversibilityLabels}}"
+            >
+              <view class="tag-chip {{tags.reversibility ? (tags.aiGenerated ? 'tag-chip--ai' : 'tag-chip--manual') : 'tag-chip--empty'}}">
+                <text class="tag-chip-label">可逆性</text>
+                <text class="tag-chip-value" wx:if="{{reversibilityDisplay}}">{{reversibilityDisplay}}</text>
+                <text class="tag-chip-value tag-chip-placeholder" wx:else>选择</text>
+              </view>
+            </picker>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-bar">
+    <button class="btn-next {{canSubmit ? '' : 'btn-disabled'}}" bindtap="goNext">
+      下一步
+    </button>
+  </view>
+</view>

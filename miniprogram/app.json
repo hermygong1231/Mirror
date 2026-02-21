@@ -1,0 +1,37 @@
+{
+  "pages": [
+    "pages/decisions/list",
+    "pages/create/step1",
+    "pages/create/step2",
+    "pages/create/step3",
+    "pages/review/recall",
+    "pages/review/input",
+    "pages/review/result",
+    "pages/index/index",
+    "pages/chatBot/chatBot"
+  ],
+  "usingComponents": {
+    "custom-map": "/components/toolCard/map/index",
+    "custom-weather": "/components/toolCard/weather/index",
+    "custom-food-list": "/components/toolCard/food-list/index",
+    "custom-business-list": "/components/toolCard/business-list/index"
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "棱镜",
+    "backgroundColor": "#eeeeee",
+    "backgroundTextStyle": "light",
+    "enablePullDownRefresh": true
+  },
+  "sitemapLocation": "sitemap.json",
+  "libVersion": "3.7.1",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "networkTimeout": {
+    "request": 300000,
+    "connectSocket": 60000,
+    "uploadFile": 60000,
+    "downloadFile": 60000
+  }
+}

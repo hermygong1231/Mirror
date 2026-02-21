@@ -1,0 +1,100 @@
+<!-- pages/create/step3.wxml -->
+<view class="page-container">
+  <!-- 进度条 -->
+  <view class="progress-bar">
+    <view class="progress-steps">
+      <view class="step done">
+        <view class="step-dot">✓</view>
+        <text class="step-label">决策</text>
+      </view>
+      <view class="step-line step-line-active"></view>
+      <view class="step done">
+        <view class="step-dot">✓</view>
+        <text class="step-label">理由</text>
+      </view>
+      <view class="step-line step-line-active"></view>
+      <view class="step active">
+        <view class="step-dot">3</view>
+        <text class="step-label">预期</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="form-section">
+    <view class="section-title">为未来的你留个证据</view>
+
+    <!-- 预期 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">你预期会发生什么?</text>
+        <text class="label-required">*</text>
+      </view>
+      <textarea
+        class="form-textarea"
+        placeholder="具体一点，可量化更好\n例如: 用户量达到1万"
+        value="{{expectations}}"
+        bindinput="onExpectationsInput"
+        maxlength="1000"
+        auto-height
+      />
+    </view>
+
+    <!-- 复盘时间 -->
+    <view class="form-group">
+      <view class="form-label">
+        <text class="label-text">多久后复盘?</text>
+        <text class="label-required">*</text>
+      </view>
+      <view class="period-grid">
+        <view
+          class="period-btn {{reviewPeriod === item.key ? 'period-active' : ''}}"
+          wx:for="{{periods}}"
+          wx:key="key"
+          bindtap="selectPeriod"
+          data-key="{{item.key}}"
+        >
+          <text class="period-label">{{item.label}}</text>
+        </view>
+      </view>
+      <view class="review-date-hint" wx:if="{{reviewDateText}}">
+        <text class="date-icon">📅</text>
+        <text>将在 {{reviewDateText}} 提醒你复盘</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-bar" wx:if="{{!showSuccess}}">
+    <view class="btn-row">
+      <button class="btn-back" bindtap="goBack">上一步</button>
+      <button
+        class="btn-submit {{canSubmit && !submitting ? '' : 'btn-disabled'}}"
+        bindtap="submitDecision"
+      >
+        {{submitting ? '提交中...' : '完成记录'}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 提交成功引导页 -->
+  <view class="success-overlay" wx:if="{{showSuccess}}">
+    <view class="success-content">
+      <view class="success-icon-wrap">
+        <text class="success-icon">✅</text>
+      </view>
+      <text class="success-title">决策已记录</text>
+      <text class="success-subtitle">到了复盘日，棱镜会提醒你回来看看</text>
+
+      <view class="success-guide-card">
+        <view class="guide-card-header">
+          <text class="guide-card-icon">💡</text>
+          <text class="guide-card-title">想先体验一下「复盘 + 智能分析」？</text>
+        </view>
+        <text class="guide-card-desc">我们准备了一个示例决策，你可以立刻体验完整的复盘流程和智能洞察分析</text>
+        <button class="guide-btn-primary" bindtap="goToReviewSample">去体验复盘 →</button>
+      </view>
+
+      <button class="guide-btn-secondary" bindtap="goToList">先看看我的决策列表</button>
+    </view>
+  </view>
+</view>

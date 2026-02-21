@@ -1,0 +1,140 @@
+<!-- pages/review/result.wxml -->
+<view class="page-container">
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{analyzing}}">
+    <view class="analyzing-state">
+      <!-- 动画脑图图标 -->
+      <view class="analyzing-brain">
+        <view class="brain-circle brain-circle--1"></view>
+        <view class="brain-circle brain-circle--2"></view>
+        <view class="brain-circle brain-circle--3"></view>
+        <view class="analyzing-icon">🧠</view>
+      </view>
+
+      <text class="analyzing-text">棱镜正在折射你的决策...</text>
+
+      <!-- 金句轮播 -->
+      <view class="quote-container {{quoteVisible ? 'quote-visible' : ''}}" wx:if="{{currentQuote}}">
+        <text class="quote-text">"{{currentQuote.text}}"</text>
+        <text class="quote-author">— {{currentQuote.author}}</text>
+      </view>
+
+      <!-- 进度点 -->
+      <view class="analyzing-dots">
+        <view class="dot dot--1"></view>
+        <view class="dot dot--2"></view>
+        <view class="dot dot--3"></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:elif="{{analysis}}">
+    <!-- 头部 -->
+    <view class="result-header">
+      <text class="result-title">{{isPositive ? '🌟 棱镜 · 成功折射' : '🔍 棱镜 · 决策折射'}}</text>
+    </view>
+
+    <!-- 核心洞察 -->
+    <view class="result-section" wx:if="{{analysis.coreIssue}}">
+      <view class="section-card core-card {{isPositive ? 'core-positive' : ''}}">
+        <text class="card-icon">{{isPositive ? '🏆' : '🎯'}}</text>
+        <text class="core-text">{{analysis.coreIssue}}</text>
+      </view>
+    </view>
+
+    <!-- 分析总结 -->
+    <view class="result-section">
+      <view class="section-card">
+        <view class="card-header">
+          <text class="card-icon">📊</text>
+          <text class="card-title">{{isPositive ? '成功分析' : '分析总结'}}</text>
+        </view>
+        <text class="card-content">{{analysis.summary}}</text>
+      </view>
+    </view>
+
+    <!-- 认知标签 -->
+    <view class="result-section" wx:if="{{analysis.biasLabels.length > 0}}">
+      <view class="section-card">
+        <view class="card-header">
+          <text class="card-icon">🧠</text>
+          <text class="card-title">{{isPositive ? '思维优势' : '识别的认知偏差'}}</text>
+        </view>
+        <view class="bias-list">
+          <view class="bias-tag {{isPositive ? 'bias-positive' : ''}}" wx:for="{{analysis.biasLabels}}" wx:key="*this">
+            {{item}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 行为模式对比 -->
+    <view class="result-section" wx:if="{{analysis.currentPattern || analysis.suggestedPrinciple}}">
+      <view class="section-card principle-card">
+        <view class="card-header">
+          <text class="card-icon">💡</text>
+          <text class="card-title">{{isPositive ? '成功经验' : '行为模式洞察'}}</text>
+        </view>
+        <view class="pattern-compare">
+          <view class="pattern-item {{isPositive ? 'pattern-good' : 'pattern-current'}}" wx:if="{{analysis.currentPattern}}">
+            <text class="pattern-label">{{isPositive ? '你的优势' : '你这次的模式'}}</text>
+            <text class="pattern-text">{{analysis.currentPattern}}</text>
+          </view>
+          <view class="pattern-arrow" wx:if="{{analysis.currentPattern && analysis.suggestedPrinciple}}">→</view>
+          <view class="pattern-item pattern-suggest" wx:if="{{analysis.suggestedPrinciple}}">
+            <text class="pattern-label">{{isPositive ? '提炼为原则' : '建议调整为'}}</text>
+            <text class="pattern-text">{{analysis.suggestedPrinciple}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <!-- 兼容旧数据 -->
+    <view class="result-section" wx:elif="{{analysis.principle}}">
+      <view class="section-card principle-card">
+        <view class="card-header">
+          <text class="card-icon">💡</text>
+          <text class="card-title">智能建议的决策原则</text>
+        </view>
+        <text class="principle-text">{{analysis.principle}}</text>
+      </view>
+    </view>
+
+    <!-- 建议 -->
+    <view class="result-section" wx:if="{{analysis.suggestion}}">
+      <view class="section-card">
+        <view class="card-header">
+          <text class="card-icon">🔮</text>
+          <text class="card-title">{{isPositive ? '如何延续优势' : '下次决策建议'}}</text>
+        </view>
+        <text class="card-content">{{analysis.suggestion}}</text>
+      </view>
+    </view>
+
+    <!-- 反馈 -->
+    <view class="feedback-section" wx:if="{{!feedbackSent}}">
+      <text class="feedback-title">这次分析，有没有打破你的认知？</text>
+      <view class="feedback-btns">
+        <button class="feedback-btn agree" bindtap="sendFeedback" data-agreed="true">
+          🔨 破壁了
+        </button>
+        <button class="feedback-btn disagree" bindtap="sendFeedback" data-agreed="false">
+          🧱 没破
+        </button>
+      </view>
+    </view>
+    <view class="feedback-section feedback-done" wx:elif="{{feedbackAgreed}}">
+      <text>🔨 已破壁 · 认知又进了一步</text>
+    </view>
+    <view class="feedback-section feedback-done" wx:else>
+      <text>🧱 已记录 · 下次会更准</text>
+    </view>
+
+    <!-- 底部操作 -->
+    <view class="action-section">
+      <button class="btn-home" bindtap="goHome">返回首页</button>
+    </view>
+  </view>
+</view>

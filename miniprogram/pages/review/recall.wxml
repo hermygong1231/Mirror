@@ -1,0 +1,82 @@
+<!-- pages/review/recall.wxml -->
+<view class="page-container">
+  <view class="loading-state" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <view wx:elif="{{decision}}">
+    <!-- 时间标题 -->
+    <view class="time-header">
+      <text class="time-badge">{{timePassed}}的决策</text>
+      <text class="time-date">{{createdDateStr}}</text>
+    </view>
+
+    <!-- 决策回顾卡片 -->
+    <view class="recall-section">
+      <view class="recall-card">
+        <view class="recall-item">
+          <text class="recall-icon">📋</text>
+          <view class="recall-content">
+            <text class="recall-label">当时的决定</text>
+            <text class="recall-value">{{decision.decision}}</text>
+          </view>
+        </view>
+
+        <view class="recall-divider"></view>
+
+        <view class="recall-item">
+          <text class="recall-icon">✅</text>
+          <view class="recall-content">
+            <text class="recall-label">你选择了</text>
+            <text class="recall-value recall-chosen">{{decision.chosenOption}}</text>
+          </view>
+        </view>
+
+        <view class="recall-divider"></view>
+
+        <view class="recall-item">
+          <text class="recall-icon">💭</text>
+          <view class="recall-content">
+            <text class="recall-label">你的理由</text>
+            <text class="recall-value">{{decision.reasoning}}</text>
+          </view>
+        </view>
+
+        <view class="recall-divider"></view>
+
+        <view class="recall-item">
+          <text class="recall-icon">😰</text>
+          <view class="recall-content">
+            <text class="recall-label">你的担心</text>
+            <text class="recall-value concern-text">{{decision.concerns}}</text>
+          </view>
+        </view>
+
+        <view class="recall-divider"></view>
+
+        <view class="recall-item">
+          <text class="recall-icon">{{emotionEmoji}}</text>
+          <view class="recall-content">
+            <text class="recall-label">你的情绪</text>
+            <text class="recall-value">{{emotionLabel}}</text>
+          </view>
+        </view>
+
+        <view class="recall-divider"></view>
+
+        <view class="recall-item">
+          <text class="recall-icon">🎯</text>
+          <view class="recall-content">
+            <text class="recall-label">你的预期</text>
+            <text class="recall-value">{{decision.expectations}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部按钮 -->
+    <view class="bottom-bar">
+      <button class="btn-review" bindtap="goReview">开始复盘</button>
+    </view>
+  </view>
+</view>
